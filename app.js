@@ -9,6 +9,7 @@ const GridFsStorage = require("multer-gridfs-storage");
 const multer = require("multer");
 const Fuse = require("fuse.js");
 const Books = require("./models/Books");
+const assetsPath = path.join(__dirname + "/public/stylesheets");
 
 const userRouter = require("./routes/userRouter"); //Hiten put your files in userRouter
 const uploadRouter = require("./routes/uploadRouter"); //Ankit put your files in uplaodRouter
@@ -51,6 +52,7 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+app.use(express.static(assetsPath));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
