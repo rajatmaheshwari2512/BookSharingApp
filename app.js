@@ -70,7 +70,7 @@ Books.find({}, (err, collections) => {
 //app.use("/users", userRouter);
 //app.use("/upload", uploadRouter);
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/public/stylesheets/index.html');
 })
 
 //Takes the query from the input, search from the database and give the results 
