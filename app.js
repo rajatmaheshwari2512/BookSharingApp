@@ -10,7 +10,6 @@ const multer = require("multer");
 const Fuse = require('fuse.js');
 const Books = require('./model/Books');
 
-const indexRouter = require("./routes/index");
 const userRouter = require("./routes/userRouter"); //Hiten put your files in userRouter
 const uploadRouter = require("./routes/uploadRouter"); //Ankit put your files in uplaodRouter
 
@@ -68,7 +67,6 @@ Books.find({}, (err, collections) => {
 
 
 //Routers
-app.use("/", indexRouter);
 //app.use("/users", userRouter);
 //app.use("/upload", uploadRouter);
 app.get('/', (req, res) => {
