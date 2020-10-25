@@ -59,7 +59,7 @@ app.use(express.static(path.join(__dirname, "public")));
 //Routers
 app.use("/", indexRouter);
 //app.use("/users", userRouter);
-//app.use("/upload", uploadRouter);
+app.use("/upload", uploadRouter);
 
 app.use(function (req, res, next) {
   next(createError(404));
