@@ -9,7 +9,6 @@ const path = require('path')
 const methodOverride = require('method-override')
 const uploadRouter = express.Router();
 
-
 //Middleware
 uploadRouter.use(bodyParser.json())
 uploadRouter.use(methodOverride("_method"))
