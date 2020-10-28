@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload-Download</title>
 </head>
-
 <body>
   <form method="GET" action="/upload/books">
     <button type="submit">Books</button>
@@ -26,19 +24,11 @@
     <input type="submit" value="Submit">
     <hr>
   </form>
-
-  <div id='pdfStoring'>
     <!-- files is the variable for ejs , it works when a file is been uploaded else only the above code is just rendered -->
     <% if(files){
-      if(dup=='duplicate')
-      {%>
+      if(dup=='duplicate'){%>
       <h1>The file already exists</h1>
-      <% }
-      else{ %>
-        <h1></h1>
-    <% }} %> <!-- Ending of that if statement-->
-    
-  </div>
+      <% }%>
+    <% } %> <!-- Ending of that if statement-->
 </body>
-
 </html>
