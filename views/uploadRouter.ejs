@@ -5,25 +5,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload-Download</title>
-  <style>
-    canvas {
-      border: 1px solid black;
-      direction: ltr;
-      height: 300px;
-      width: 200px;
-    }
-  </style>
 </head>
 
 <body>
-  <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+  <form method="GET" action="/upload/books">
+    <button type="submit">Books</button>
+  </form>
   <!--Uploading form-->
   <form method="POST" enctype="multipart/form-data" action="/upload/download">
     <h1 id='heading'>Upload/Download</h1>
     <label for='file'><input type="file" name='file' id='file' required></label><br>
     <label for="title_book">Title<br><input type="text" name="title_book" id="title_book" required></label><br>
     <label for='author'>Author<br><input type="text" name="author" id="author" required></label><br>
-    <label for="desc">Description<br><textarea name="desc" id="desc" cols="30" rows="10" required></textarea></label><br>
+    <label for="desc">Description<br><textarea name="desc" id="desc" cols="30" rows="10" ></textarea></label><br>
+    Select the genre:
+    <input type="radio" name="bookType" value="Fiction" checked><label for='Fiction'>Fiction</label>
+    <input type="radio" name="bookType" value="NonFiction"><label for='NonFiction'>Non-Fiction</label>
+    <input type="radio" name="bookType" value="FanFiction"><label for='FanFiction'>Fan-fiction</label>
+    <br>
     <input type="submit" value="Submit">
     <hr>
   </form>
@@ -31,63 +30,13 @@
   <div id='pdfStoring'>
     <!-- files is the variable for ejs , it works when a file is been uploaded else only the above code is just rendered -->
     <% if(files){
-      var recentFile = files[files.length-1] %>
-    <canvas id="<%= recentFile.filename%>"></canvas>
-    <!-- This below comment code can be used to show the pdf directly-->
-    <!--<embed width="300" height="375" src="pdf/<%= recentFile.filename %>#toolbar=0">--> 
-    <script>
-      //url for the file to be uploaded
-      var url = '/upload/pdf/<%= recentFile.filename %>';
-      // Loaded via <script> tag, create shortcut to access PDF.js exports.
-      var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-      // The workerSrc property shall be specified.
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-      //Below code is directly taken from pdf.js site to load the first page from the pdf
-      var loadingTask = pdfjsLib.getDocument(url);
-      loadingTask.promise.then(function (pdf) {
-        console.log('PDF loaded');
-
-        // Fetch the first page
-        var pageNumber = 1;
-        pdf.getPage(pageNumber).then(function (page) {
-          console.log('Page loaded');
-
-          var scale = 1.5;
-          var viewport = page.getViewport({
-            scale: scale
-          });
-
-          // Prepare canvas using PDF page dimensions
-          var canvas = document.getElementById('<%= recentFile.filename%>');
-          var context = canvas.getContext('2d');
-          canvas.height = viewport.height;
-          canvas.width = viewport.width;
-
-          // Render PDF page into canvas context
-          var renderContext = {
-            canvasContext: context,
-            viewport: viewport
-          };
-          var renderTask = page.render(renderContext);
-          renderTask.promise.then(function () {
-            console.log('Page rendered');
-          });
-        });
-      }, function (reason) {
-        // PDF loading error
-        console.error(reason);
-      });
-    </script>
-    <!-- Download and Previwer form -->
-    <form action="/upload/pdf/<%= recentFile.filename%>" method="GET" target="_blank">
-      <label for='download'><input type="submit" value="View the pdf"></label>
-    </form>
-    <a href="/pdf/<%= recentFile.filename %>" target="_blank" rel="noopener noreferrer" download>Download the PDF</a>
-      <h1>Title : <%= recentFile.metadata.title %> by <%= recentFile.metadata.author  %></h1>
-      <h2>Desc : <%= recentFile.metadata.desc  %></h2>
-    <% } %> <!-- Ending of that if statement-->
+      if(dup=='duplicate')
+      {%>
+      <h1>The file already exists</h1>
+      <% }
+      else{ %>
+        <h1></h1>
+    <% }} %> <!-- Ending of that if statement-->
     
   </div>
 </body>
