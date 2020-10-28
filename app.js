@@ -69,7 +69,7 @@ Books.find({}, (err, collections) => {
 
 //Routers
 //app.use("/users", userRouter);
-//app.use("/upload", uploadRouter);
+app.use("/upload", uploadRouter);
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/stylesheets/index.html");
 });
