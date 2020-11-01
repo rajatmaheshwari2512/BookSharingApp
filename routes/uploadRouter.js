@@ -1,24 +1,22 @@
-const express = require("express");
-const ejs = require("ejs");
-const multer = require("multer");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const Grid = require("gridfs-stream");
-const GridFsStorage = require("multer-gridfs-storage");
-const path = require("path");
-const methodOverride = require("method-override");
+const express = require('express')
+const ejs = require('ejs')
+const multer = require('multer')
+const mongoose = require('mongoose')
+const bodyParser = require('body-parser')
+const Grid = require('gridfs-stream')
+const GridFsStorage = require('multer-gridfs-storage')
+const path = require('path')
+const methodOverride = require('method-override')
 const uploadRouter = express.Router();
 
-//Middleware
 
+//Middleware
 uploadRouter.use(bodyParser.urlencoded({ extended: true }));
 uploadRouter.use(bodyParser.json())
 uploadRouter.use(methodOverride("_method"))
 
-
 //this variable gives the data of the files getting uploaded .
 var gfs;
-var nameVar=''; //this variable gives us what (if-else) statement is exceuted for the duplicate.
 var storing; /*this variable for storing how many same type of files 
 are stored by the way if more than 1 is stored it delete and gives error 
 , so no 2 same files can be stored*/
@@ -26,40 +24,38 @@ are stored by the way if more than 1 is stored it delete and gives error
 //Mongoose Connection
 const uri = 'mongodb://localhost/testing'
 mongoose.connect( uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true } )
-
-
 const con = mongoose.connection;
-con.on("open", () => {
-  gfs = Grid(con.db, mongoose.mongo);
-  gfs.collection("uploads"); //The folder in booksharing where all the data will be stored
-  console.log("Connected to Database");
-});
+con.on('open',()=>{
+    gfs = Grid(con.db,mongoose.mongo)
+    gfs.collection('uploads') //The folder in booksharing where all the data will be stored
+    console.log("Connected to Database")
+})
 
 
 //storage
 var storage = new GridFsStorage({
-  url: uri,
-  file: (req, file) => {
-    return new Promise((resolve, reject) => {
-      const filename = file.originalname; //+Date.now() + path.extname(file.originalname)
-      const fileinfo = {
-        filename: filename,
-        bucketName: "uploads", //same as gfs.collection
-      };
-      resolve(fileinfo);
-    });
-  },
-});
+    url:uri,
+    file: (req,file)=>{
+        return new Promise((resolve,reject)=>{
+            const filename = file.originalname  //+Date.now() + path.extname(file.originalname)
+            const fileinfo = {
+                filename : filename,
+                bucketName : 'uploads', //same as gfs.collection
+            };
+            resolve(fileinfo)
+        })
+    }
+})
 
-const upload = multer({ storage });
+const upload = multer({storage});
 
-uploadRouter.get("/", (req, res) => {
-  gfs.files.find().toArray((err, files) => {
-    if (!files || files.length == 0) {
-      res.render("uploadRouter", { files: false });
-    } else {
-      //This can be used, when we specify only pdf to be uploaded into the database , baad me add karduga only pdf
-      /*files.map(file => {
+uploadRouter.get('/',(req,res)=>{
+    gfs.files.find().toArray((err,files)=>{
+        if(!files || files.length==0){
+            res.render('uploadRouter',{files:false})
+        }else{
+            //This can be used, when we specify only pdf to be uploaded into the database , baad me add karduga only pdf
+            /*files.map(file => {
                 if(file.contentType =="application/pdf"){
                   file.isPDF = true;
                 }
@@ -67,9 +63,8 @@ uploadRouter.get("/", (req, res) => {
                   file.isPDF = false;
                 }
               })*/
-
               //dup gives duplicate , so that we can show the user, you tried to upload the already existing file.
-              res.render('uploadRouter',{files:files,dup:nameVar})
+              res.render('uploadRouter',{files:files})
         }
     })
 })
@@ -85,7 +80,6 @@ uploadRouter.get('/books',(req,res)=>{
     })
 })
 
-
 uploadRouter.get('/download-read/:idOfBook',(req,res)=>{
     const idOfBook = req.params.idOfBook;
     gfs.files.find().toArray((err,data)=>{
@@ -98,8 +92,8 @@ uploadRouter.get('/download-read/:idOfBook',(req,res)=>{
 })
 
 //This is used to upload all the documents to mongodb
-uploadRouter.post("/download", upload.single("file"), async (req, res) => {
-  /*var source = gfs.createReadStream({filename:req.file.filename});
+uploadRouter.post('/download',upload.single('file'),async (req,res)=>{
+    /*var source = gfs.createReadStream({filename:req.file.filename});
 
     var target = gfs.createWriteStream({
         filename:req.file.filename,
@@ -107,7 +101,6 @@ uploadRouter.post("/download", upload.single("file"), async (req, res) => {
     });
 
     source.pipe(target);*/
-
     try
     {
         storing=0;
@@ -121,11 +114,9 @@ uploadRouter.post("/download", upload.single("file"), async (req, res) => {
                 //the duplicate file is been removed here
                 if(storing>1){
                     gfs.files.remove({_id:req.file.id})
-                    nameVar = 'duplicate'
+                    req.flash('duplicate_file','File already exists')
                     res.redirect('/upload')
                 }else{
-                    nameVar = 'stored';
-                    
                     gfs.files.updateOne({_id:req.file.id},{'$set':{metadata:{
                         title:req.body.title_book,
                         author:req.body.author,
@@ -159,8 +150,5 @@ uploadRouter.get('/pdf/:nameOfFile',(req,res)=>{
         })
     })
 })
-
-
-
 
 module.exports = uploadRouter;

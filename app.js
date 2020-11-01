@@ -7,6 +7,8 @@ const logger = require("morgan");
 const mongoose = require("mongoose");
 const Grid = require("gridfs-stream");
 const GridFsStorage = require("multer-gridfs-storage");
+const flash = require('connect-flash');
+const session = require('express-session');
 const multer = require("multer");
 const Fuse = require("fuse.js");
 const assetsPath = path.join(__dirname + "/public/stylesheets");
@@ -74,6 +76,22 @@ Books.find({}, (err, collections) => {
     books.push(data);
   });
 });
+
+//express-seesion middlewares
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+}));
+
+//connect flash
+app.use(flash());
+
+//global variables used for flash
+app.use((req,res,next)=>{
+    res.locals.duplicate_file = req.flash('duplicate_file');
+    next();
+})
 
 //Routers
 app.use("/user", userRouter);
