@@ -13,7 +13,8 @@ const assetsPath = path.join(__dirname + "/public/stylesheets");
 const encrypt=require('mongoose-encryption');
 const passport=require('passport');
 const passportLocal=require('passport-local-mongoose');
-const session=require('express-session');
+const flash = require('connect-flash')
+const session = require('express-session');
 const GoogleStrategy = require('passport-google-oauth20').Strategy; 
 const findOrCreate = require('mongoose-findorcreate')
 const Books = require("./models/Books");
@@ -74,6 +75,22 @@ Books.find({}, (err, collections) => {
     books.push(data);
   });
 });
+
+//express-seesion middlewares
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true,
+}));
+
+//connect flash
+app.use(flash());
+
+//global variables used for flash
+app.use((req,res,next)=>{
+    res.locals.duplicate_file = req.flash('duplicate_file');
+    next();
+})
 
 //Routers
 app.use("/user", userRouter);
