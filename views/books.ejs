@@ -1,105 +1,111 @@
 <!-- This page shows all the books -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Books</title>
     <style>
-        h1 {
-            text-align: center;
-        }
-        #container {
-            position: absolute;
-            display: grid;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -40%);
-            height: 100vh;
-            width: 80%;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 5%;
-        }
+      h1 {
+        text-align: center;
+      }
+      #container {
+        position: absolute;
+        display: grid;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -40%);
+        height: 100vh;
+        width: 80%;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5%;
+      }
 
-        #container div {
-            display: flex;
-            flex-direction: column;
-            justify-self: center;
-            text-align: center;
-            align-items: center;
-            height: 40%;
-            width: 100%;
-        }
-        canvas{
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-        }
-        .k{
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 70%;
-        }
+      #container div {
+        display: flex;
+        flex-direction: column;
+        justify-self: center;
+        text-align: center;
+        align-items: center;
+        height: 40%;
+        width: 100%;
+      }
+      canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+      }
+      .k {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 70%;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <form method="GET" action="/upload">
-        <button type="submit">Back</button>
-      </form>
+      <button type="submit">Back</button>
+    </form>
     <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
     <h1>Books</h1>
-    <div id='container'>
-        <% if(files){
-            files.forEach((file)=>{ %>
-        <div>
-            <a class='k' href="/upload/download-read/<%=file._id%>"><canvas id="<%= file.filename%>"></canvas></a>
-            <!-- This below comment code can be used to show the pdf directly-->
-            <!--<embed width="300" height="375" src="pdf/<%= file.filename %>#toolbar=0">-->
-            <script>
-                //url for the file to be uploaded
-                var url = '/upload/pdf/<%= file.filename %>';
-                // Loaded via <script> tag, create shortcut to access PDF.js exports.
-                var pdfjsLib = window['pdfjs-dist/build/pdf'];
-                // The workerSrc property shall be specified.
-                pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-                //Below code is directly taken from pdf.js site to load the first page from the pdf
-                var loadingTask = pdfjsLib.getDocument(url);
-                loadingTask.promise.then(function (pdf) {
-                    console.log('PDF loaded');
-                    // Fetch the first page
-                    var pageNumber = 1;
-                    pdf.getPage(pageNumber).then(function (page) {
-                        console.log('Page loaded');
-                        var scale = 1.5;
-                        var viewport = page.getViewport({
-                            scale: scale
-                        });
-                        // Prepare canvas using PDF page dimensions
-                        var canvas = document.getElementById('<%= file.filename%>');
-                        var context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-                        // Render PDF page into canvas context
-                        var renderContext = {
-                            canvasContext: context,
-                            viewport: viewport
-                        };
-                        var renderTask = page.render(renderContext);
-                        renderTask.promise.then(function () {
-                            console.log('Page rendered');
-                        });
-                    });
-                }, function (reason) {
-                    // PDF loading error
-                    console.error(reason);
+    <div id="container">
+      <% if(files){ files.forEach((file)=>{ %>
+      <div>
+        <a class="k" href="/upload/download-read/<%=file._id%>"
+          ><canvas id="<%= file.filename%>"></canvas
+        ></a>
+        <!-- This below comment code can be used to show the pdf directly-->
+        <!--<embed width="300" height="375" src="pdf/<%= file.filename %>#toolbar=0">-->
+        <script>
+          //url for the file to be uploaded
+          var url = "/upload/pdf/<%= file.filename %>";
+          // Loaded via <script> tag, create shortcut to access PDF.js exports.
+          var pdfjsLib = window["pdfjs-dist/build/pdf"];
+          // The workerSrc property shall be specified.
+          pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "//mozilla.github.io/pdf.js/build/pdf.worker.js";
+          //Below code is directly taken from pdf.js site to load the first page from the pdf
+          var loadingTask = pdfjsLib.getDocument(url);
+          loadingTask.promise.then(
+            function (pdf) {
+              console.log("PDF loaded");
+              // Fetch the first page
+              var pageNumber = 1;
+              pdf.getPage(pageNumber).then(function (page) {
+                console.log("Page loaded");
+                var scale = 1.5;
+                var viewport = page.getViewport({
+                  scale: scale,
                 });
-            </script>
-            <span><%= file.metadata.title %> by <%= file.metadata.author  %></span><br>
-            <span>Genre: <%=file.metadata.genre%></span>
-        </div>
-        <%})} %>
+                // Prepare canvas using PDF page dimensions
+                var canvas = document.getElementById("<%= file.filename%>");
+                var context = canvas.getContext("2d");
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                // Render PDF page into canvas context
+                var renderContext = {
+                  canvasContext: context,
+                  viewport: viewport,
+                };
+                var renderTask = page.render(renderContext);
+                renderTask.promise.then(function () {
+                  console.log("Page rendered");
+                });
+              });
+            },
+            function (reason) {
+              // PDF loading error
+              console.error(reason);
+            }
+          );
+        </script>
+        <span><%= file.metadata.title %> by <%= file.metadata.author %></span
+        ><br />
+        <span>Genre: <%=file.metadata.genre%></span>
+      </div>
+      <%})} %>
     </div>
-</body>
+  </body>
 </html>
