@@ -1,3 +1,4 @@
+require('dotenv').config()
 const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
@@ -10,8 +11,15 @@ const flash = require('connect-flash');
 const session = require('express-session');
 const multer = require("multer");
 const Fuse = require("fuse.js");
-const Books = require("./models/Books");
 const assetsPath = path.join(__dirname + "/public/stylesheets");
+const encrypt=require('mongoose-encryption');
+const passport=require('passport');
+const passportLocal=require('passport-local-mongoose');
+const session=require('express-session');
+const GoogleStrategy = require('passport-google-oauth20').Strategy; 
+const findOrCreate = require('mongoose-findorcreate')
+const Books = require("./models/Books");
+const user = require("./models/user");
 
 const userRouter = require("./routes/userRouter"); //Hiten put your files in userRouter
 const uploadRouter = require("./routes/uploadRouter"); //Ankit put your files in uplaodRouter
@@ -86,7 +94,7 @@ app.use((req,res,next)=>{
 })
 
 //Routers
-//app.use("/users", userRouter);
+app.use("/user", userRouter);
 app.use("/upload", uploadRouter);
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/stylesheets/index.html");
